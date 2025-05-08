@@ -4,16 +4,13 @@ import SI
 
 
 # Hashing problem
-class SampleMeta:
-    def __init__(self, title):
-        self.units    = SI.units(title)
-        self.exponent = SI.exponent(title)
-
 
 class Measurement:
-    def __init__(self, data: np.ndarray, meta: SampleMeta):
-        self.data = data
-        self.meta = meta
+    def __init__(self, data: np.ndarray, title):
+        self.data        = data
+        self.units       = SI.units(title)
+        self.exponent    = SI.exponent(title)
+        self.type_direct = False
 
 
 class TableMonster:

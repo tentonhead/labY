@@ -1,11 +1,14 @@
-import csv
+#import csv
+import numpy as np
+
+from ..records.record import Record
 
 
 def data(labels, file_name="input.csv"):
     """Reads data from file and parses it into Records."""
     data = read_data(file_name)
-    measurements = parse_data(data, labels)
-    return measurements
+    records = parse_data(data, labels)
+    return records
 
 
 def read_data(file_name):
@@ -36,7 +39,7 @@ def parse_data(data, labels):
                 else:
                     num = int(num)
                 columns[j].append(num)
-    measurements = []
+    records = []
     for i in range(len(labels)):
-        measurements.append(Record(np.array(columns[i]), labels[i]))
-    return measurements
+        records.append(Record(np.array(columns[i]), labels[i]))
+    return records

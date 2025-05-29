@@ -73,3 +73,6 @@ class Record:
 
     def __repr__(self):
         return f"Record:{self.label} = {self.data}"
+
+def N(number: int):
+    return Record(np.array([i for i in range(1, number+1)]), "N")

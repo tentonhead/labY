@@ -1,7 +1,7 @@
 import numpy as np
 
 from .stats import standard_deviation, sigma
-from ..records.record import Record
+from ..records.record import Record, N
 from ..table.table import Table
 
 
@@ -88,7 +88,7 @@ class LeastSquares():
         return self.a_coef, self.b_coef
 
     def table(self):
-        return Table(self.records)
+        return Table(*self.records)
 
     def outro(self):
         outro_string = (self.coefficients_string()
@@ -150,30 +150,37 @@ def least_squares(x, y, names, presicion=3):
     return a, b, contents, averages, deviations
 """
 
-def pair_point(x, y, headings): #SHOULD RETURN TABLE
+class PairPoint(): #SHOULD RETURN TABLE
     """Calculates angle using method of pairs of points
     and it's standard deviation
     """
-    if len(x)%2 != 0:
-        print("Number of points must be even in order to use pair")
-        return 0, 0, 0
+    def __init__(self, x: Record, y: Record, letter="", units="", multiplier=1):
+        #def __init__(self, x: Record, y: Record, headings, unit):
+        if len(x.data)%2 != 0:
+            print("Number of points must be even in order to use PPM")
+            return 0, 0, 0
+        pairs = len(x.data)//2
+        x1 = x.data[0:pairs]; x2 = x.data[pairs:]
+        y1 = y.data[0:pairs]; y2 = y.data[pairs:]
+        self.x, self.y = x, y
+        self.n = N(pairs)
+        self.angles = Record((x2-x1) / (y2-y1)*multiplier, f"{letter}, {units}")
+        self.angle = np.average(self.angles.data)
+        self.sigma = 0.0
+        self.avg_dif, self.avg_dif2 = standard_deviation(self.angles, letter)
+        self.sigma = sigma(self.avg_dif2)
 
-    pairs = int(len(x)/2)
-    point_pairs = ["" for i in range(pairs)]
-    Δx       = np.zeros(pairs)
-    Δy       = np.zeros(pairs)
-    angle    = np.zeros(pairs)
-
-    for i in range(pairs):
-        point_pairs[i] = f"{i+1}-{i+pairs+1}"
-        Δx[i] = round(x[i+pairs] - x[i], 3)
-        Δy[i] = round(y[i+pairs] - y[i], 3)
-        angle[i] = round(Δy[i]/Δx[i], 3)
-
-    k = np.average(angle) 
-    avg_dif, avg_dif2 = standard_deviation(angle)
-
-    σ = sigma(avg_dif2)
-    contents = [point_pairs, Δx, Δy, angle, avg_dif, avg_dif2]
-    #table = Table(headings, contents)
-    return k, σ, contents
+    """
+    def angle(self):
+        return self.angle
+    """
+    def points(self):
+        gap = self.n//2
+        s = ["" for i in range(gap)]
+        for i in range(1, len(s)+1):
+            # Wait, can I print column of strings?
+             s[i] = f"{i+gap}-{i}"
+             
+    def table(self):
+        return Table(self.n, self.x, self.y, self.angles,
+                     self.avg_dif, self.avg_dif2)
